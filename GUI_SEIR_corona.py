@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-  
+
 # This is for python3 (function names associated with tkinter are different between python2 and python3)
 from tkinter import *
 import tkinter as tk
@@ -61,33 +61,36 @@ top = tk.Tk()
 
 L1 = Label(top, text="Parameters",).grid(row=0,column=1)
 L2 = Label(top, text="Total population size",).grid(row=1,column=0)
-L3 = Label(top, text="Average symptomatic period (days)",).grid(row=2,column=0)
-L4 = Label(top, text="Average latency period (days)",).grid(row=3,column=0)
+L3 = Label(top, text="Average symptomatic period (days)",).grid(row=3,column=0)
+L4 = Label(top, text="Average latency (asymptomatic) period (days)",).grid(row=2,column=0)
 L5 = Label(top, text="Timesteps to simulate for (days)",).grid(row=4,column=0)
 L6 = Label(top, text="Basic reproduction number",).grid(row=5,column=0)
-#L7 = Label(top, text="Press q to quit.").grid(row=7,column=0)
-L8 = Label(top, text="Select a version of SEIR model").grid(row=6,column=0)
+#L7 = Label(top, text="Set y-axis as log scale").grid(row=7,column=0)
+L8 = Label(top, text="Is latency period infectious?").grid(row=6,column=0)
 E1 = Entry(top, bd =5)
 E1.grid(row=1,column=1)
 E1.insert(END,"100000")
 E2 = Entry(top, bd =5)
-E2.grid(row=2,column=1)
+E2.grid(row=3,column=1)
 E2.insert(END,"10") # default average symptomatic period for coronavirus
 E3 = Entry(top, bd =5)
-E3.grid(row=3,column=1)
+E3.grid(row=2,column=1)
 E3.insert(END,"5") # default average latency period
 E4 = Entry(top, bd =5)
 E4.grid(row=4,column=1)
 E4.insert(END,"400") # default calculation timesteps
 E5 = Entry(top, bd =5)
 E5.grid(row=5, column=1)
-E5.insert(END,"2.5,1,0.7") # default basic reproduction rate
-var1 = IntVar()
-var2 = IntVar()
-C1 = Checkbutton(top, text="COVID-19", variable=var1, onvalue=1, offvalue=0)
+E5.insert(END,"2.5,1") # default basic reproduction rate
+var = IntVar()
+C1 = Radiobutton(top, text="Yes (likely for COVID-19)", variable=var, value=1)
 C1.grid(row=6,column=1)
-C2 = Checkbutton(top, text="original", variable=var2, onvalue=1, offvalue=0)
+C2 = Radiobutton(top, text="No (original SEIR model)", variable=var, value=2)
+var.set(1) # give a default value on load-up so I can click "calculate" right away!
 C2.grid(row=6,column=2)
+vscale = IntVar()
+C3 = Checkbutton(top, text="Set y-axis as log scale", variable=vscale, onvalue=1, offvalue=0)
+C3.grid(row=7,column=1)
 
 def _quit():
 	top.destroy()
@@ -104,16 +107,39 @@ def process():
 	else:
 		r_ls = [float(rn)]
 	fig = plt.figure(figsize=(6,5))
-	ax = fig.add_subplot(111)
-	for r in r_ls:
-		if (var1.get() == 1) & (var2.get() == 0):
+	#if (var1.get() == 1) & (var2.get() == 0):
+	if var.get() == 1:
+		ax = fig.add_subplot(111)
+		for r in r_ls:
 			results = covid19SEIR(N,r,i,l,time)
-		elif (var1.get() == 0) & (var2.get() == 1):
+			Plot(ax,results,r)
+		ax.legend(title="basic reproduction number")
+		if vscale.get() == 1:
+			ax.set_yscale('log')
+	#elif (var1.get() == 0) & (var2.get() == 1):
+	elif var.get() == 2:
+		ax = fig.add_subplot(111)
+		for r in r_ls:
 			results = oriSEIR(N,r,i,l,time)
-		else:
-			return
-		Plot(ax,results,r)
-	ax.legend()
+			Plot(ax,results,r)
+		ax.legend(title="basic reproduction number")
+		if vscale.get() == 1:
+			ax.set_yscale('log')
+	#elif (var1.get() == 1) & (var2.get() == 1):
+	#	ax1 = fig.add_subplot(1,2,1)
+	#	for r in r_ls:
+	#		results = covid19SEIR(N,r,i,l,time)
+	#		Plot(ax1,results,r)
+	#	ax1.set_title("Infectious latency period")
+	#	ax2 = fig.add_subplot(1,2,2)
+	#	for r in r_ls:
+	#		results = oriSEIR(N,r,i,l,time)
+	#		Plot(ax2,results,r)
+	#	ax2.set_title("NonInfectious latency period")
+	#	ax2.legend(title="basic reproduction number")
+	else:
+		return
+	plt.suptitle("Press q to quit, c to close figure")
 	output = FigureCanvasTkAgg(fig, master=top)
 	output.draw()
 
@@ -124,11 +150,11 @@ def process():
 			output.get_tk_widget().destroy()
 		key_press_handler(event,output)
 
-	ax.set_title("Press q to quit, c to close figure")
 	output.mpl_connect("key_press_event", on_key_press)
-	output.get_tk_widget().pack(side=tk.LEFT,fill=tk.BOTH)
+	#output.get_tk_widget().pack(side=tk.LEFT,fill=tk.BOTH) # can't use fill and grid in the same master window!
+	output.get_tk_widget().grid(row=9,column=1)
 
-B1 = Button(top, text="Calculate",command=process).grid(row=7,column=1,)
-#B2 = Button(top, text="Quit",command=_quit).grid(row=7,column=2,)
+B1 = Button(top, text="Calculate",command=process).grid(row=8,column=1,)
+B2 = Button(top, text="Quit",command=_quit).grid(row=8,column=2) # for quality of life :)
 
 tk.mainloop()
