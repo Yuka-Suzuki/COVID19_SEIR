@@ -125,32 +125,11 @@ def process():
 		ax.legend(title="basic reproduction number")
 		if vscale.get() == 1:
 			ax.set_yscale('log')
-	#elif (var1.get() == 1) & (var2.get() == 1):
-	#	ax1 = fig.add_subplot(1,2,1)
-	#	for r in r_ls:
-	#		results = covid19SEIR(N,r,i,l,time)
-	#		Plot(ax1,results,r)
-	#	ax1.set_title("Infectious latency period")
-	#	ax2 = fig.add_subplot(1,2,2)
-	#	for r in r_ls:
-	#		results = oriSEIR(N,r,i,l,time)
-	#		Plot(ax2,results,r)
-	#	ax2.set_title("NonInfectious latency period")
-	#	ax2.legend(title="basic reproduction number")
 	else:
 		return
-	plt.suptitle("Press q to quit, c to close figure")
 	output = FigureCanvasTkAgg(fig, master=top)
 	output.draw()
 
-	def on_key_press(event):
-		if event.key == 'q':
-			_quit()
-		if event.key == 'c':
-			output.get_tk_widget().destroy()
-		key_press_handler(event,output)
-
-	output.mpl_connect("key_press_event", on_key_press)
 	#output.get_tk_widget().pack(side=tk.LEFT,fill=tk.BOTH) # can't use fill and grid in the same master window!
 	output.get_tk_widget().grid(row=9,column=1)
 
