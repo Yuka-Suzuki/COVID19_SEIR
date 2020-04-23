@@ -5,6 +5,8 @@ If you have different types of computer or are curious about codes and models, <
 - SEIR_covid19.ipynb: Jupyter notebook with the codes of SEIR model. This can run interactively on binder https://mybinder.org/
 - environment.yml: python environment setting for SEIR_covid19.ipynb to interactively run on binder.
 
+Please bear in mind that the purpose of this model is to see how effective to change certain paremeter (e.g. changing behavior) to reduce the number of infected people, but NOT to predict well the number of infected people. This is because of some simplification made by the model and it is often hard to obtain precise parameters about human movement.
+
 ### Parameters
 1. Total population size (assuming a fixed population size over time simulated)
 2. Average latency (asymptomatic) period: Latency period is usually the period after a person is exposed to a source of infection, the person does not show symptoms and not infectious. However, there seems to be cases with COVID-19 in which asymptomatic people are infectious. (select one of these assumptions in 6th parameter). Default 5 days, estimation for COVID-19.
